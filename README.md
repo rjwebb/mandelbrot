@@ -21,3 +21,5 @@ This can then be opened and displayed by the Mandelbrot Viewer script.
 	python ./mandelbrotViewer.py [input file]
 
 This script displays a representation of the data created by the previous script on screen using Pygame(SDL), and saves a copy onto disk which is timestamped.
+
+Currently the viewer script doesn't render Multibrot sets properly. Hopefully in the future I will save not only the 2D array of values but the metadata as well (pickled class?).

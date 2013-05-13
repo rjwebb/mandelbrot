@@ -18,10 +18,14 @@ class memoized(object):
    def __init__(self, func):
       self.func = func
       self.cache = {}
+      self.reqs = 0
+      self.misses = 0
    def __call__(self, *args):
+      self.reqs += 1
       try:
          return self.cache[args]
       except KeyError:
+         self.misses += 1
          value = self.func(*args)
          self.cache[args] = value
          return value
@@ -29,12 +33,6 @@ class memoized(object):
          # uncachable -- for instance, passing a list as an argument.
          # Better to not cache than to blow up entirely.
          return self.func(*args)
-   def __repr__(self):
-      '''Return the function's docstring.'''
-      return self.func.__doc__
-   def __get__(self, obj, objtype):
-      '''Support instance methods.'''
-      return functools.partial(self.__call__, obj)
 
 def drawData(surface,data,colourScheme):
     '''
@@ -49,18 +47,22 @@ def drawData(surface,data,colourScheme):
 
 @memoized
 def itersToColour(iters):
-    #print iters/255
-    rgb = [int(255*x) for x in colorsys.hls_to_rgb(1.0/(iters+1),0.5,0.8)]
-    #print rgb
-    
+    rgb = [int(255*x) for x in colorsys.hls_to_rgb(1.0/(iters+1),0.5,1)]
     return Color(*rgb)
+
+def loadMandelbrot(path):
+    dataFile = open(path,'r')
+    
+    values = []
+    lines = dataFile.readlines()
+    for line in lines[2:]:
+        values.append([int(c) for c in line.split(',')])
+    return values
 
 def main():
     inputFileName = sys.argv[1] # the pickle file to be read ^^
     
-    dataFile = open(inputFileName,'r')
-    
-    data = pickle.load(dataFile)
+    data = loadMandelbrot(inputFileName)
     
     pygame.init()
     
